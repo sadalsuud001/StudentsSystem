@@ -1,0 +1,163 @@
+require 'sinatra'
+#require 'sinatra/reloader'
+require 'sass'
+require 'dm-core'
+require 'dm-migrations'
+require_relative 'students'
+require_relative 'comments'
+#require 'erb'
+
+configure do
+  enable :sessions
+  set :username, "admin" 
+  set :password, "admin"
+end
+
+configure :development do
+    DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/development.db")
+    #DataMapper.auto_upgrade!
+end
+
+configure :production do
+    DataMapper.setup(:default, ENV['DATABASE_URL'])
+    #DataMapper.auto_upgrade!
+end
+
+get '/' do
+  @title = "Student Information System"
+  erb :home
+end
+
+get '/about' do
+  @title = "Student Information System"
+  erb :about
+end
+
+get '/contact' do
+  @title = "Contact Student Information System"
+  erb :contact
+end
+
+get '/students' do
+  @students = Student.all
+  @title = "Student Information System"
+  erb :students
+end
+
+get '/students/new' do
+    @title = "new student"
+    erb :newstudent
+end
+
+post '/students/new' do
+    student = Student.create(params[:student])
+    redirect to("/students/#{student.id}")
+end
+
+get '/students/:id' do
+    @student = Student.get(params[:id])
+    @titile = "Student: #{@student.firstname} #{@student.lastname}"
+    erb :showstudent
+end
+
+get '/students/:id/edit' do
+    if session[:admin]
+        @student = Student.get(params[:id])
+        @title = "Edit Student"
+        erb :editstudent
+    else
+        session[:from_comments] = false
+        session[:from_students] = true
+        redirect to ('/login')
+    end
+end
+
+post '/students/:id/edit' do
+    student = Student.get(params[:id])
+    student.update(params[:student])
+    redirect to("/students/#{student.id}")
+end
+
+get'/students/:id/delete' do
+    if session[:admin]
+        Student.get(params[:id]).destroy
+        redirect to("/students")
+    else
+        session[:from_students] = true
+        redirect to ('/login')
+    end
+end
+
+get '/comments' do
+  @comments = Comment.all
+  @title = "Comments"
+  erb :comments
+end
+
+get '/comments/new' do
+    @titile = "new comment"
+    erb :newcomment
+end
+
+post '/comments/new' do
+    comment = Comment.create(params[:comment])
+    redirect to("/comments/#{comment.id}")
+end
+
+get '/comments/:id' do
+  @comment = Comment.get(params[:id])
+  @title = "Comment"
+  erb :showcomment
+end
+
+get '/comments/:id/edit' do
+    @comment = Comment.get(params[:id])
+    @title = "#{@comment.comment_body}"
+    erb :editcomment
+end
+
+post '/comments/:id/edit' do
+  comment = Comment.get(params[:id])
+  comment.update(params[:comment])
+  redirect to("/comments/#{comment.id}")
+end
+
+get '/comments/:id/delete' do
+  Comment.get(params[:id]).destroy
+  redirect to("/comments")
+end
+
+get '/Video' do
+  @title = "Videos"
+  erb :video
+end
+
+get '/login' do
+  @title = "Student Information System"
+  erb :login
+end
+
+post '/login' do
+  if params[:username] == settings.username && params[:password] == settings.password
+    session[:admin] = true
+    if session[:from_students]
+        redirect to("/students")
+    else
+        redirect to("/")
+    end
+  else
+    @title = "Login"
+    erb :login
+  end
+end
+
+get '/logout' do
+  session.clear
+  redirect to ("/")
+end
+
+not_found do
+  @title = "Student Information System"
+  erb :notfound, :layout => false
+end
+

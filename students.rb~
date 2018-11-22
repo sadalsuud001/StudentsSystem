@@ -1,0 +1,20 @@
+require 'dm-core'
+require 'dm-migrations'
+
+#DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/students.db")
+
+class Student
+  include DataMapper::Resource
+  property :id, Serial
+  property :firstname, String
+  property :lastname, String
+  property :birthday, Text
+  property :address, Text
+end
+
+DataMapper.finalize
+
+get '/students' do
+  @students = Student.all
+  erb :students
+end

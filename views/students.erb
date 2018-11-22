@@ -1,0 +1,17 @@
+<h2> Students Management</h2>
+<h3> Students list </h3>
+<ul>
+    <% @students.each do |student| %>
+        <li><a href="/students/<%= student.id %>" >
+            <%= student.firstname %> 
+            <%= student.lastname %> 
+            <%= student.studentid %>
+        </a></li>
+    <% end %>
+</ul>
+
+
+<ul>
+  <li><a href = '/students/new'>Create a new student</a> </li>
+</ul>
+

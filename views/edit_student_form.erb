@@ -1,0 +1,15 @@
+<!DOCTYPE html>    
+<h1>You can edit the student's information</h1>
+<form action="/students/<%=@student.id%>/edit" method='post'>
+    Firstname: <input type='string' name=student[firstname] value="<%=@student.firstname%>" required><br>
+    
+    Lastname: <input type='string' name=student[lastname] value="<%=@student.lastname%>" required><br>
+    
+    Birthday (MM/DD/YYYY): <input type='text' name=student[birthday] value="<%=@student.birthday%>" pattern="(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d"><br>
+    
+    Address: <input type='text' name=student[address] value="<%=@student.address%>"><br>
+    
+    Student ID: <input type='text' name=student[studentid] value="<%=@student.studentid%>" pattern="\d+" required><br>
+    
+    <input type='submit' value='submit'>
+</form>
